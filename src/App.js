@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 
-import * as firebase from 'firebase/app';
-import * as fstore from'firebase/firestore';
-import {getAuth ,GoogleAuthProvider ,signInWithPopup} from  'firebase/auth';
+import firebase from 'firebase';
 
 
 import {useAuthState} from 'react-firebase-hooks/auth';
@@ -19,8 +17,8 @@ firebase.initializeApp({
   measurementId: "G-VLVQPX4PQ2"
 })
 
-const auth =getAuth();
-const firestore=fstore.getFirestore();
+const auth = firebase.auth();
+const db=firebase.firestore();
 
 
 
@@ -31,7 +29,9 @@ function App() {
   return (
     <div className="App">
       <header className="App-header" >
-        
+            <h1>⚛️🔥💬</h1>
+            <SignOut />
+      
       </header>
       <section className="App-main">
         {user ? <ChatRoom /> :<SignIn />}
@@ -43,8 +43,8 @@ function App() {
 function SignIn() {
 
   const signInWithGoogle = () =>{
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth ,provider);
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
   }
 
 return(
@@ -60,7 +60,7 @@ function SignOut(){
   )
 }
 function ChatRoom() {
-  const messagesRef=firestore.collection('messages');
+  const messagesRef=db.collection('messages');
   const query =messagesRef.orderBy('createdAt').limit(25);
 
   const[messages] =useCollectionData(query ,{idField :'id'});
@@ -73,7 +73,7 @@ function ChatRoom() {
 
     await messagesRef.add({
       text : formValue,
-      createdAt : firestore.FieldValue.serverTimestamp(),
+      createdAt : firebase.firestore.FieldValue.serverTimestamp(),
       uid,
       photoURL
     });
